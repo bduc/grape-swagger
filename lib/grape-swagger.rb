@@ -85,6 +85,11 @@ module Grape
               header['Access-Control-Allow-Origin'] = '*'
               header['Access-Control-Request-Method'] = '*'
               routes = @@target_class::combined_routes[params[:name]]
+              
+              if @@hide_documentation_path
+                routes.reject!{ |route| "#{route.route_path}".index(parse_path(@@mount_path, nil)) == 0 }
+              end
+
               routes_array = routes.map do |route|
                 notes = route.route_notes && @@markdown ? Kramdown::Document.new(strip_heredoc(route.route_notes)).to_html : route.route_notes
                 http_codes = parse_http_codes route.route_http_codes
